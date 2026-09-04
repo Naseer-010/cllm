@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cllm Flasher - BalenaEtcher Portable LLM Drive Creator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-group">
+                <div class="logo-icon">⚡</div>
+                <div>
+                    <h1 class="logo-title">cllm Flasher</h1>
+                    <p class="logo-subtitle">Model-Agnostic BalenaEtcher Drive Creator</p>
+                </div>
+            </div>
+            <div class="badge">Etcher Engine v1.0</div>
+        </header>
+
+        <!-- Main Flasher Grid -->
+        <main class="flasher-grid">
+            <!-- STEP 1: Select Model -->
+            <section class="step-card" id="step-1">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <h2>MODEL</h2>
+                </div>
+                
+                <div class="step-body">
+                    <!-- Unselected State -->
+                    <div class="drop-zone" id="drop-zone">
+                        <div class="drop-icon">📦</div>
+                        <div class="drop-title" id="drop-title">No Model Selected</div>
+                        <p class="drop-sub">Select any <code>.gguf</code> model file from disk or local directory</p>
+                        
+                        <div class="btn-group">
+                            <button class="select-btn" id="file-select-btn">📁 Select GGUF File</button>
+                            <button class="select-btn secondary" id="scan-local-btn">🔍 Scan Local Models</button>
+                        </div>
+                        <input type="file" id="hidden-file-input" accept=".gguf" class="hidden">
+                    </div>
+
+                    <!-- Discovered Local Models Modal / List (Hidden by default) -->
+                    <div class="local-models-box hidden" id="local-models-box">
+                        <div class="local-models-header">
+                            <span>Detected Local .gguf Files:</span>
+                            <button class="close-btn" id="close-scan-btn">✕</button>
+                        </div>
+                        <div class="local-models-list" id="local-models-list"></div>
+                    </div>
+
+                    <!-- Selected State Card (Hidden until selected) -->
+                    <div class="selected-model-card hidden" id="selected-model-card">
+                        <div class="model-card-header">
+                            <span class="check-icon">✓</span>
+                            <span class="model-filename" id="model-filename">model.gguf</span>
+                            <button class="change-btn" id="change-model-btn">Change</button>
+                        </div>
+                        <div class="model-specs-grid">
+                            <div class="spec-item">
+                                <span class="spec-label">Format</span>
+                                <span class="spec-val" id="spec-format">GGUF</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Size</span>
+                                <span class="spec-val" id="spec-size">2.5 GB</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Architecture</span>
+                                <span class="spec-val" id="spec-arch">Qwen</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Quantization</span>
+                                <span class="spec-val" id="spec-quant">Q4_K_M</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Connector Arrow -->
+            <div class="step-connector">➔</div>
+
+            <!-- STEP 2: Select Drive -->
+            <section class="step-card" id="step-2">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <h2>TARGET DRIVE</h2>
+                </div>
+                
+                <div class="step-body">
+                    <div class="drive-refresh-row">
+                        <span class="field-label">Connected USB Devices:</span>
+                        <button class="refresh-btn" id="refresh-drives-btn">↻ Refresh</button>
+                    </div>
+
+                    <div class="drive-list" id="drive-list">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
+
+                    <div class="custom-drive-box">
+                        <input type="text" id="custom-drive-path" placeholder="Or enter drive mount path e.g. /media/user/CLLM">
+                    </div>
+                </div>
+
+                <div class="step-footer">
+                    <span class="selection-indicator" id="drive-selected-text">No drive selected</span>
+                </div>
+            </section>
+
+            <!-- Connector Arrow -->
+            <div class="step-connector">➔</div>
+
+            <!-- STEP 3: Flash Drive -->
+            <section class="step-card action-card" id="step-3">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+                    <h2>FLASH DRIVE</h2>
+                </div>
+                
+                <div class="step-body action-body">
+                    <p class="step-desc">Package runtime & model onto USB drive.</p>
+                    
+                    <button class="flash-main-btn disabled" id="flash-btn" disabled>
+                        <span class="btn-icon">⚡</span>
+                        <span id="flash-btn-text">FLASH CLLM DRIVE</span>
+                    </button>
+
+                    <!-- Progress Box -->
+                    <div class="progress-box hidden" id="progress-box">
+                        <div class="progress-info">
+                            <span class="progress-status" id="progress-status-text">Flashing drive...</span>
+                            <span class="progress-percent" id="progress-percent-text">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                        </div>
+                        <div class="progress-sub" id="progress-sub-text">Copying model weights</div>
+                    </div>
+
+                    <!-- Completion Banner -->
+                    <div class="completion-box hidden" id="completion-box">
+                        <div class="completion-icon">🎉</div>
+                        <h3>Flash Completed!</h3>
+                        <p>Your portable LLM drive is ready for use.</p>
+                        <div class="completion-code">
+                            <code>./cllm</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

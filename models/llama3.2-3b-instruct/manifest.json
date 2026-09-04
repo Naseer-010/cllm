@@ -1,0 +1,12 @@
+{
+  "name": "Llama 3.2 3B Instruct",
+  "filename": "llama-3.2-3b-instruct-q4_k_m.gguf",
+  "format": "GGUF",
+  "quantization": "Q4_K_M",
+  "size_bytes": 2040109465,
+  "size_formatted": "1.90 GB",
+  "context_length": 8192,
+  "recommended_vram_gb": 2.8,
+  "runtime": "llama.cpp",
+  "description": "Meta Llama 3.2 3B instruction tuned model"
+}

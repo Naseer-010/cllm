@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+"""
+cllm - Portable Pendrive LLM Executable Entrypoint
+Command Line Interface Launcher for cllm portable LLM system.
+"""
+
+import os
+import sys
+
+# Locate root project directory relative to this script
+BIN_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(BIN_DIR)
+
+sys.path.insert(0, ROOT_DIR)
+
+from scripts.hardware import get_hardware_info
+from scripts.model_manager import ModelManager
+from scripts.setup_runtime import RuntimeSetup
+from scripts.flasher import DriveFlasher
+from scripts.interactive import CllmCLI
+
+def print_help():
+    help_text = """
+cllm - Portable Pendrive LLM System (v0.1.0)
+
+USAGE:
+  cllm [command] [options]
+
+COMMANDS:
+  (none)                         Launch interactive model selector & chat
+  --dry-run                      Run in simulation mode without requiring model weights
+  gui, flash-gui                 Launch Etcher-style Desktop GUI Flasher application
+  list, models                   List all detected models on portable storage
+  system, hardware               Display host hardware specs & runtime recommendations
+  setup, download-runtime        Fetch official llama.cpp binaries for host OS
+  flash <target_dir> [model_src] Create/flash a portable cllm USB drive layout (CLI)
+  help, --help, -h               Show this help manual
+
+EXAMPLES:
+  ./cllm                          # Run CLI interactive mode
+  ./cllm gui                      # Launch Etcher-style GUI flasher in browser
+  ./cllm-flasher                  # Launch GUI flasher directly
+  ./cllm flash /media/usb         # Flash portable cllm layout to USB drive (CLI)
+"""
+    print(help_text)
+
+def main():
+    args = sys.argv[1:]
+
+    if not args:
+        cli = CllmCLI(ROOT_DIR)
+        cli.run([])
+        return
+
+    cmd = args[0].lower()
+
+    if cmd in ["help", "--help", "-h"]:
+        print_help()
+
+    elif cmd in ["list", "models"]:
+        mm = ModelManager(os.path.join(ROOT_DIR, "models"))
+        models = mm.scan_models()
+        print(f"=== cllm Discovered Models ({len(models)}) ===")
+        for idx, m in enumerate(models, 1):
+            print(f"  [{idx}] {m.name} ({m.quantization}) - {m.size_formatted}")
+            print(f"      Path: {m.full_path}")
+
+    elif cmd in ["system", "hardware"]:
+        hw = get_hardware_info(os.path.join(ROOT_DIR, "config", "device.json"))
+        print("=== cllm Host Hardware Specs ===")
+        print(f"OS Platform : {hw.os_name} ({hw.arch})")
+        print(f"CPU Model   : {hw.cpu_model}")
+        print(f"CPU Cores   : {hw.cpu_cores_physical} physical / {hw.cpu_cores_logical} logical")
+        print(f"RAM Total   : {hw.ram_total_mb / 1024:.2f} GB ({hw.ram_free_mb / 1024:.2f} GB available)")
+        if hw.gpu:
+            print(f"GPU Name    : {hw.gpu.name} ({hw.gpu.vendor})")
+            print(f"VRAM Free   : {hw.gpu.vram_free_mb / 1024:.2f} GB / {hw.gpu.vram_total_mb / 1024:.2f} GB")
+
+    elif cmd in ["setup", "download-runtime"]:
+        setup = RuntimeSetup(ROOT_DIR)
+        setup.download_runtime()
+
+    elif cmd in ["gui", "flash-gui", "flasher"]:
+        from scripts.flasher_gui import run_flasher_gui
+        run_flasher_gui()
+
+    elif cmd == "flash":
+        if len(args) < 2:
+            print("[Error] Missing target directory for flash command.")
+            print("Usage: cllm flash <target_path> [model_file_or_url]")
+            sys.exit(1)
+        target_dir = args[1]
+        model_src = args[2] if len(args) > 2 else None
+        flasher = DriveFlasher(ROOT_DIR)
+        flasher.flash_drive(target_dir, model_src)
+
+    else:
+        # Fallback to interactive mode with args
+        cli = CllmCLI(ROOT_DIR)
+        cli.run(args)
+
+
+if __name__ == "__main__":
+    main()

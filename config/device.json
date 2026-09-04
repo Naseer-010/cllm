@@ -1,0 +1,18 @@
+{
+  "os_name": "Linux",
+  "arch": "x86_64",
+  "cpu_model": "Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz",
+  "cpu_cores_logical": 8,
+  "cpu_cores_physical": 4,
+  "ram_total_mb": 7795,
+  "ram_free_mb": 658,
+  "gpu": {
+    "vendor": "Intel",
+    "name": "Intel Corporation UHD Graphics 620 (rev 07)",
+    "vram_total_mb": 2048,
+    "vram_free_mb": 1536,
+    "cuda_available": false,
+    "metal_available": false,
+    "vulkan_available": false
+  }
+}

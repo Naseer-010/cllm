@@ -1,0 +1,12 @@
+{
+  "name": "Qwen 2.5 Coder 3B Instruct",
+  "filename": "qwen2.5-coder-3b-instruct-q4_k_m.gguf",
+  "format": "GGUF",
+  "quantization": "Q4_K_M",
+  "size_bytes": 2147483648,
+  "size_formatted": "2.15 GB",
+  "context_length": 32768,
+  "recommended_vram_gb": 3.0,
+  "runtime": "llama.cpp",
+  "description": "High performance 3B coding and reasoning LLM by Qwen"
+}
