@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cllm Chat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="top-bar">
+            <div class="logo">cllm</div>
+            <div class="model-info" id="model-name">Loading model...</div>
+            <div class="actions">
+                <button id="minimize-btn" class="icon-btn" title="Minimize">&#x2212;</button>
+                <button id="close-btn" class="icon-btn" title="Close">&#x2715;</button>
+            </div>
+        </header>
+        <main class="chat-area" id="chat-container">
+            <div id="messages"></div>
+            <div id="typing-indicator" class="hidden">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+        </main>
+        <footer class="input-area">
+            <div class="input-container">
+                <textarea id="message-input" placeholder="Type a message..." rows="1"></textarea>
+                <button id="send-btn" class="send-btn" disabled>&#x27A4;</button>
+            </div>
+        </footer>
+    </div>
+    <div id="minimize-overlay" class="hidden overlay">
+        <div class="overlay-content">
+            <p>Chat minimized.</p>
+            <p>Close this tab or press button to restore.</p>
+            <button id="restore-btn">Restore</button>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -9,6 +9,7 @@ import sys
 import shutil
 import json
 import hashlib
+import time
 import urllib.request
 from typing import Optional
 
@@ -42,10 +43,23 @@ class DriveFlasher:
                 return False
 
         # 1. Create portable directory structure
-        dirs_to_create = ["bin", "config", "models", "runtime", "scripts"]
+        dirs_to_create = ["bin", "config", "models", "runtime", "scripts", "gui", "gui/chat"]
         for d in dirs_to_create:
             path = os.path.join(target_dir, d)
             os.makedirs(path, exist_ok=True)
+
+        # 1b. Copy GUI files (chat UI + flasher UI)
+        gui_source = os.path.join(self.root_source_dir, "gui")
+        gui_target = os.path.join(target_dir, "gui")
+        if os.path.exists(gui_source):
+            for sub in ["", "chat"]:
+                src_dir = os.path.join(gui_source, sub) if sub else gui_source
+                dst_dir = os.path.join(gui_target, sub) if sub else gui_target
+                if os.path.isdir(src_dir):
+                    for item in os.listdir(src_dir):
+                        src_file = os.path.join(src_dir, item)
+                        if os.path.isfile(src_file):
+                            shutil.copy2(src_file, os.path.join(dst_dir, item))
 
         # 2. Copy core python engine scripts
         scripts_source = os.path.join(self.root_source_dir, "scripts")

@@ -3,157 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cllm Flasher - BalenaEtcher Portable LLM Drive Creator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>cllm Flasher</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo-group">
-                <div class="logo-icon">⚡</div>
-                <div>
-                    <h1 class="logo-title">cllm Flasher</h1>
-                    <p class="logo-subtitle">Model-Agnostic BalenaEtcher Drive Creator</p>
-                </div>
-            </div>
-            <div class="badge">Etcher Engine v1.0</div>
+    <div class="container">
+        <header>
+            <h1>cllm Flasher</h1>
         </header>
 
-        <!-- Main Flasher Grid -->
-        <main class="flasher-grid">
-            <!-- STEP 1: Select Model -->
-            <section class="step-card" id="step-1">
-                <div class="step-header">
-                    <span class="step-number">1</span>
-                    <h2>MODEL</h2>
-                </div>
+        <main>
+            <!-- Model Section -->
+            <section class="card">
+                <h2>Model</h2>
                 
-                <div class="step-body">
-                    <!-- Unselected State -->
-                    <div class="drop-zone" id="drop-zone">
-                        <div class="drop-icon">📦</div>
-                        <div class="drop-title" id="drop-title">No Model Selected</div>
-                        <p class="drop-sub">Select any <code>.gguf</code> model file from disk or local directory</p>
-                        
-                        <div class="btn-group">
-                            <button class="select-btn" id="file-select-btn">📁 Select GGUF File</button>
-                            <button class="select-btn secondary" id="scan-local-btn">🔍 Scan Local Models</button>
-                        </div>
-                        <input type="file" id="hidden-file-input" accept=".gguf" class="hidden">
-                    </div>
+                <div class="tabs">
+                    <button class="tab-btn active" data-target="hf-tab">Download from HuggingFace</button>
+                    <button class="tab-btn" data-target="local-tab">Upload Local File</button>
+                </div>
 
-                    <!-- Discovered Local Models Modal / List (Hidden by default) -->
-                    <div class="local-models-box hidden" id="local-models-box">
-                        <div class="local-models-header">
-                            <span>Detected Local .gguf Files:</span>
-                            <button class="close-btn" id="close-scan-btn">✕</button>
-                        </div>
-                        <div class="local-models-list" id="local-models-list"></div>
-                    </div>
+                <div class="tab-content active" id="hf-tab">
+                    <label for="hf-model-select">Select a model:</label>
+                    <select id="hf-model-select" class="form-control">
+                        <option value="" disabled selected>Select a model to download...</option>
+                        <optgroup label="Small (1-3B)">
+                            <option value='{"repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF", "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf", "size": "397 MB"}'>Qwen 2.5 0.5B Instruct (397 MB)</option>
+                            <option value='{"repo": "Qwen/Qwen2.5-1.5B-Instruct-GGUF", "file": "qwen2.5-1.5b-instruct-q4_k_m.gguf", "size": "1.1 GB"}'>Qwen 2.5 1.5B Instruct (1.1 GB)</option>
+                            <option value='{"repo": "Qwen/Qwen2.5-3B-Instruct-GGUF", "file": "qwen2.5-3b-instruct-q4_k_m.gguf", "size": "2.1 GB"}'>Qwen 2.5 3B Instruct (2.1 GB)</option>
+                            <option value='{"repo": "microsoft/Phi-3.5-mini-instruct-gguf", "file": "Phi-3.5-mini-instruct-Q4_K_M.gguf", "size": "2.4 GB"}'>Phi 3.5 Mini Instruct (2.4 GB)</option>
+                            <option value='{"repo": "HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF", "file": "smollm2-1.7b-instruct-q4_k_m.gguf", "size": "1.0 GB"}'>SmolLM2 1.7B Instruct (1.0 GB)</option>
+                        </optgroup>
+                        <optgroup label="Medium (4-8B)">
+                            <option value='{"repo": "Qwen/Qwen2.5-7B-Instruct-GGUF", "file": "qwen2.5-7b-instruct-q4_k_m.gguf", "size": "4.7 GB"}'>Qwen 2.5 7B Instruct (4.7 GB)</option>
+                            <option value='{"repo": "bartowski/Meta-Llama-3.1-8B-Instruct-GGUF", "file": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf", "size": "4.9 GB"}'>Llama 3.1 8B Instruct (4.9 GB)</option>
+                            <option value='{"repo": "bartowski/gemma-2-9b-it-GGUF", "file": "gemma-2-9b-it-Q4_K_M.gguf", "size": "5.6 GB"}'>Gemma 2 9B IT (5.6 GB)</option>
+                            <option value='{"repo": "bartowski/Mistral-7B-Instruct-v0.3-GGUF", "file": "Mistral-7B-Instruct-v0.3-Q4_K_M.gguf", "size": "4.4 GB"}'>Mistral 7B Instruct v0.3 (4.4 GB)</option>
+                            <option value='{"repo": "QuantFactory/DeepSeek-R1-Distill-Qwen-7B-GGUF", "file": "DeepSeek-R1-Distill-Qwen-7B.Q4_K_M.gguf", "size": "4.7 GB"}'>DeepSeek R1 Distill Qwen 7B (4.7 GB)</option>
+                        </optgroup>
+                        <optgroup label="Large (14B+)">
+                            <option value='{"repo": "Qwen/Qwen2.5-14B-Instruct-GGUF", "file": "qwen2.5-14b-instruct-q4_k_m.gguf", "size": "8.8 GB"}'>Qwen 2.5 14B Instruct (8.8 GB)</option>
+                            <option value='{"repo": "bartowski/Qwen2.5-32B-Instruct-GGUF", "file": "Qwen2.5-32B-Instruct-Q4_K_M.gguf", "size": "20.1 GB"}'>Qwen 2.5 32B Instruct (20.1 GB)</option>
+                        </optgroup>
+                    </select>
+                    <div id="hf-info" class="info-text muted" style="display: none;"></div>
+                </div>
 
-                    <!-- Selected State Card (Hidden until selected) -->
-                    <div class="selected-model-card hidden" id="selected-model-card">
-                        <div class="model-card-header">
-                            <span class="check-icon">✓</span>
-                            <span class="model-filename" id="model-filename">model.gguf</span>
-                            <button class="change-btn" id="change-model-btn">Change</button>
-                        </div>
-                        <div class="model-specs-grid">
-                            <div class="spec-item">
-                                <span class="spec-label">Format</span>
-                                <span class="spec-val" id="spec-format">GGUF</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Size</span>
-                                <span class="spec-val" id="spec-size">2.5 GB</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Architecture</span>
-                                <span class="spec-val" id="spec-arch">Qwen</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Quantization</span>
-                                <span class="spec-val" id="spec-quant">Q4_K_M</span>
-                            </div>
-                        </div>
+                <div class="tab-content" id="local-tab">
+                    <div class="file-drop-zone" id="file-drop-zone">
+                        <p>Drag and drop a .gguf file here, or click to select</p>
+                        <input type="file" id="local-file-input" accept=".gguf" style="display: none;">
+                        <button class="btn-secondary" id="browse-btn">Browse Files</button>
                     </div>
+                    <div id="local-info" class="info-text muted" style="display: none;"></div>
                 </div>
             </section>
 
-            <!-- Connector Arrow -->
-            <div class="step-connector">➔</div>
-
-            <!-- STEP 2: Select Drive -->
-            <section class="step-card" id="step-2">
-                <div class="step-header">
-                    <span class="step-number">2</span>
-                    <h2>TARGET DRIVE</h2>
+            <!-- USB Drive Section -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>USB Drive</h2>
+                    <button class="btn-secondary small" id="refresh-drives-btn">Refresh</button>
                 </div>
                 
-                <div class="step-body">
-                    <div class="drive-refresh-row">
-                        <span class="field-label">Connected USB Devices:</span>
-                        <button class="refresh-btn" id="refresh-drives-btn">↻ Refresh</button>
-                    </div>
-
-                    <div class="drive-list" id="drive-list">
-                        <!-- Loaded dynamically via JS -->
-                    </div>
-
-                    <div class="custom-drive-box">
-                        <input type="text" id="custom-drive-path" placeholder="Or enter drive mount path e.g. /media/user/CLLM">
-                    </div>
-                </div>
-
-                <div class="step-footer">
-                    <span class="selection-indicator" id="drive-selected-text">No drive selected</span>
+                <div id="drives-container" class="drives-list">
+                    <p class="muted">Scanning for USB drives...</p>
                 </div>
             </section>
 
-            <!-- Connector Arrow -->
-            <div class="step-connector">➔</div>
-
-            <!-- STEP 3: Flash Drive -->
-            <section class="step-card action-card" id="step-3">
-                <div class="step-header">
-                    <span class="step-number">3</span>
-                    <h2>FLASH DRIVE</h2>
-                </div>
+            <!-- Action Section -->
+            <section class="action-section">
+                <button id="flash-btn" class="btn-primary" disabled>⚡ Flash Drive</button>
                 
-                <div class="step-body action-body">
-                    <p class="step-desc">Package runtime & model onto USB drive.</p>
-                    
-                    <button class="flash-main-btn disabled" id="flash-btn" disabled>
-                        <span class="btn-icon">⚡</span>
-                        <span id="flash-btn-text">FLASH CLLM DRIVE</span>
-                    </button>
-
-                    <!-- Progress Box -->
-                    <div class="progress-box hidden" id="progress-box">
-                        <div class="progress-info">
-                            <span class="progress-status" id="progress-status-text">Flashing drive...</span>
-                            <span class="progress-percent" id="progress-percent-text">0%</span>
-                        </div>
-                        <div class="progress-bar-bg">
-                            <div class="progress-bar-fill" id="progress-bar-fill"></div>
-                        </div>
-                        <div class="progress-sub" id="progress-sub-text">Copying model weights</div>
+                <div id="progress-container" class="progress-container" style="display: none;">
+                    <div class="progress-header">
+                        <span id="progress-status" class="status-text">Starting...</span>
+                        <span id="progress-percent" class="percent-text">0%</span>
                     </div>
-
-                    <!-- Completion Banner -->
-                    <div class="completion-box hidden" id="completion-box">
-                        <div class="completion-icon">🎉</div>
-                        <h3>Flash Completed!</h3>
-                        <p>Your portable LLM drive is ready for use.</p>
-                        <div class="completion-code">
-                            <code>./cllm</code>
-                        </div>
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar-fill" class="progress-bar-fill"></div>
                     </div>
+                    <div id="progress-subtext" class="subtext muted"></div>
                 </div>
+
+                <div id="success-message" class="success-message" style="display: none;">
+                    Successfully flashed the drive!
+                </div>
+                <div id="error-message" class="error-message" style="display: none;"></div>
             </section>
         </main>
     </div>

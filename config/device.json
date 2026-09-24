@@ -5,7 +5,7 @@
   "cpu_cores_logical": 8,
   "cpu_cores_physical": 4,
   "ram_total_mb": 7795,
-  "ram_free_mb": 658,
+  "ram_free_mb": 1903,
   "gpu": {
     "vendor": "Intel",
     "name": "Intel Corporation UHD Graphics 620 (rev 07)",

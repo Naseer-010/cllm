@@ -21,15 +21,17 @@ from scripts.interactive import CllmCLI
 
 def print_help():
     help_text = """
-cllm - Portable Pendrive LLM System (v0.1.0)
+cllm - Portable Pendrive LLM System (v0.2.0)
 
 USAGE:
   cllm [command] [options]
 
 COMMANDS:
-  (none)                         Launch interactive model selector & chat
-  --dry-run                      Run in simulation mode without requiring model weights
-  gui, flash-gui                 Launch Etcher-style Desktop GUI Flasher application
+  (none)                         Launch web chat interface in browser (default)
+  chat                           Launch web chat interface in browser
+  cli                            Launch interactive terminal chat (no browser)
+  --dry-run                      Run CLI in simulation mode without model weights
+  gui, flash-gui                 Launch Etcher-style GUI Flasher application
   list, models                   List all detected models on portable storage
   system, hardware               Display host hardware specs & runtime recommendations
   setup, download-runtime        Fetch official llama.cpp binaries for host OS
@@ -37,7 +39,9 @@ COMMANDS:
   help, --help, -h               Show this help manual
 
 EXAMPLES:
-  ./cllm                          # Run CLI interactive mode
+  ./cllm                          # Open web chat UI in browser (default)
+  ./cllm chat                     # Same as above
+  ./cllm cli                      # Terminal-based interactive chat
   ./cllm gui                      # Launch Etcher-style GUI flasher in browser
   ./cllm-flasher                  # Launch GUI flasher directly
   ./cllm flash /media/usb         # Flash portable cllm layout to USB drive (CLI)
@@ -48,14 +52,26 @@ def main():
     args = sys.argv[1:]
 
     if not args:
-        cli = CllmCLI(ROOT_DIR)
-        cli.run([])
+        # Default: launch web chat UI
+        from scripts.chat_server import run_chat_server
+        run_chat_server(ROOT_DIR)
         return
 
     cmd = args[0].lower()
 
     if cmd in ["help", "--help", "-h"]:
         print_help()
+
+    elif cmd == "chat":
+        from scripts.chat_server import run_chat_server
+        port = 7870
+        if len(args) > 1 and args[1].isdigit():
+            port = int(args[1])
+        run_chat_server(ROOT_DIR, port)
+
+    elif cmd == "cli":
+        cli = CllmCLI(ROOT_DIR)
+        cli.run(args[1:])
 
     elif cmd in ["list", "models"]:
         mm = ModelManager(os.path.join(ROOT_DIR, "models"))
@@ -94,8 +110,12 @@ def main():
         flasher = DriveFlasher(ROOT_DIR)
         flasher.flash_drive(target_dir, model_src)
 
+    elif cmd == "--dry-run":
+        cli = CllmCLI(ROOT_DIR)
+        cli.run(args)
+
     else:
-        # Fallback to interactive mode with args
+        # Fallback to interactive CLI mode with args
         cli = CllmCLI(ROOT_DIR)
         cli.run(args)
 
